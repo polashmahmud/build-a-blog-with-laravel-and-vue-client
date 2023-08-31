@@ -1,8 +1,9 @@
 import {ref} from "vue";
 import axios from "axios";
 
-export default function usePosts() {
+export default function usePosts(slug) {
     const posts = ref([]);
+    const post = ref({});
 
     const fetchPosts = async () => {
         let response = await axios.get('/api/posts');
@@ -10,8 +11,16 @@ export default function usePosts() {
         posts.value = response.data.data
     }
 
+    const fetchPost = async () => {
+        let response = await axios.get(`/api/posts/${slug}`);
+
+        post.value = response.data.data
+    }
+
     return {
         posts,
-        fetchPosts
+        post,
+        fetchPosts,
+        fetchPost
     }
 }
