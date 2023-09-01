@@ -1,5 +1,5 @@
 import axios from "axios";
-import {computed, reactive} from "vue";
+import {computed, reactive, ref} from "vue";
 
 const state = reactive({
     authenticated: false,
@@ -7,6 +7,7 @@ const state = reactive({
 })
 
 export default function useAuth() {
+    const errors = ref({})
     const getAuthenticated = computed(() => state.authenticated)
     const getUser = computed(() => state.user)
 
@@ -26,7 +27,8 @@ export default function useAuth() {
 
            return response;
        } catch (e) {
-           // errors
+           setAuthenticate(false)
+           setUser({})
        }
    }
 
@@ -36,7 +38,9 @@ export default function useAuth() {
             await axios.post('/login', credentials)
             await attempt()
         } catch (e) {
-            // validation errors
+            if (e.response.status === 422) {
+                errors.value = e.response.data.errors
+            }
         }
     }
 
@@ -44,6 +48,7 @@ export default function useAuth() {
         login,
         getUser,
         getAuthenticated,
-        attempt
+        attempt,
+        errors
     }
 }
